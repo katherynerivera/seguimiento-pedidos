@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seguimiento de pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #203047;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        h1, h2 { color: #123d63; }
+        .tarjeta {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #00000012;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #aab8c5;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 12px;
+            background: #1769aa;
+            color: white;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.rechazar { background: #a33939; }
+        .paquete {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-top: 1px solid #e1e8ef;
+        }
+        .paquete form { margin: 0; }
+        .errorlist { color: #a33939; }
+        progress { width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Seguimiento de pedidos</h1>
+
+    {% for mensaje in messages %}
+        <p class="tarjeta">{{ mensaje }}</p>
+    {% endfor %}
+
+    <section class="tarjeta">
+        <h2>Registrar pedido</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Guardar pedido</button>
+        </form>
+    </section>
+
+    <h2>Pedidos registrados</h2>
+
+    {% for pedido in pedidos %}
+        <section class="tarjeta">
+            <h3>Pedido {{ pedido.numero }} — {{ pedido.cliente }}</h3>
+            <p>{{ pedido.unidades }} unidades en total</p>
+
+            <p>
+                Pendientes: {{ pedido.pendientes }} |
+                En proceso: {{ pedido.en_proceso }} |
+                En revisión: {{ pedido.en_revision }} |
+                Listos: {{ pedido.listos }}
+            </p>
+
+            <p>
+                Avance: {{ pedido.avance }} %
+                ({{ pedido.unidades_listas }} de {{ pedido.unidades }} unidades)
+            </p>
+            <progress value="{{ pedido.unidades_listas }}"
+                      max="{{ pedido.unidades }}"></progress>
+
+            <h4>Paquetes</h4>
+            {% for paquete in pedido.paquetes.all %}
+                <div class="paquete">
+                    <span>
+                        Paquete #{{ paquete.id }}:
+                        {{ paquete.unidades }} unidades —
+                        <strong>{{ paquete.get_estado_display }}</strong>
+                    </span>
+
+                    {% if paquete.estado != "listo" %}
+                        <form method="post"
+                              action="{% url 'cambiar_estado' paquete.id 'avanzar' %}">
+                            {% csrf_token %}
+                            <button type="submit">Avanzar</button>
+                        </form>
+                    {% endif %}
+
+                    {% if paquete.estado == "revision" %}
+                        <form method="post"
+                              action="{% url 'cambiar_estado' paquete.id 'rechazar' %}">
+                            {% csrf_token %}
+                            <button class="rechazar" type="submit">Rechazar</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+    {% empty %}
+        <p>Todavía no hay pedidos registrados.</p>
+    {% endfor %}
+</body>
+</html>

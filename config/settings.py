@@ -143,4 +143,4 @@ if os.environ.get("RENDER"):
         1, "whitenoise.middleware.WhiteNoiseMiddleware"
     )
 
-    STATIC_ROOT = BASE_DIR / "staticfiles
+    STATIC_ROOT = BASE_DIR / "staticfiles"

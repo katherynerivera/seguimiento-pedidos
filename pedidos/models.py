@@ -37,3 +37,14 @@ class Paquete(models.Model):
 
     def __str__(self):
         return f"Paquete {self.pk} - {self.get_estado_display()}"
+
+class MovimientoPaquete(models.Model):
+    paquete = models.ForeignKey(Paquete, on_delete=models.CASCADE, related_name="movimientos")
+    estado_anterior = models.CharField(max_length=20, choices=Paquete.Estado.choices)
+    estado_nuevo = models.CharField(max_length=20, choices=Paquete.Estado.choices)
+    es_rechazo = models.BooleanField(default=False)
+    actor = models.CharField(max_length=150, default="Sin identificar")
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-fecha", "-id"]

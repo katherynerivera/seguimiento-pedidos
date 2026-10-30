@@ -52,3 +52,10 @@ El agente recomendó instalar Django 6.1.3 o superior con Python
 disponible en el entorno. Se corrigió instalando Python 3.14
 y Django 5.2.18 en un entorno virtual nuevo. Después se verificó
 la instalación y se ejecutaron las pruebas.
+## Funcionalidades de IA pendientes
+
+Se consideran como mejoras futuras el resumen inteligente por pedido,
+la sugerencia de prioridades y un asistente para consultas en lenguaje
+natural. Su implementación y configuración con un proveedor de IA
+quedan pendientes; requieren credenciales y pueden generar costos.
+Estas funciones no están activas ni se probaron con un modelo real.
